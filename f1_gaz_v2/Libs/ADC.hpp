@@ -1,4 +1,8 @@
-#include "ADC.hpp"
+#include "stm32f10x.h"
+#include "GPIO.hpp"
+#include <vector>
+
+enum adc_num : uint8_t {ADC_1,ADC_2,ADC_3};
 
 class ADC_Base{
 	public:
@@ -22,7 +26,7 @@ class ADC_Base{
 		else if(!((GPIO_port == GPIOA) || (GPIO_port == GPIOB) || (GPIO_port == GPIOC)) && !((Pin == 0) || (Pin == 1) || (Pin == 2) || (Pin == 3) || (Pin == 4) || (Pin == 5) || (Pin == 6) || (Pin == 7))){
 			while(1);
 		}
-		Set_Gpio(GPIO_port,Pin,INPUT,ANALOG);
+		Set_Gpio(GPIO_port,Pin,INPUT,ANALOG,MED,NOT);
 		ADCx-> CR2 |= 0x00000001;					//ADC X Enable
 	}
 
@@ -30,23 +34,3 @@ class ADC_Base{
 	 uint16_t ADC_ScanConv(std::vector<uint16_t> &data);
 	 uint16_t ADC_ContinuousConv();
 };
-
-uint16_t ADC_Base::ADC_ScanConv(){
-//	ADCx-> CR1 |= 0x00000100;		//Scan Mode Enable
-	ADCx-> SQR2|= 0x00000000;
-	ADCx-> SQR1|= 0x00100000;
-	ADCx-> SQR3|= 0x00000001;
-	ADCx-> CR2 |= 0x000E0000;
-	ADCx-> CR2 |= 0x40000000;		//Regular conv start
-	return ADCx-> DR;
-}
-
-uint16_t ADC_Base::ADC_ScanConv(std::vector<uint16_t> &data){
-	ADCx-> CR1 |= 0x40000002;		//Regular conv start, Continuous mode enable
-
-	return ADCx-> DR;
-}
-
-uint16_t ADC_Base::ADC_ContinuousConv(){
-
-}

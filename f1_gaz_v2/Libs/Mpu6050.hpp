@@ -1,4 +1,4 @@
-#include "I2C.cpp"
+#include "I2C.hpp"
 
 //MPU6050 registers
 #define	MPU6050_ADDR0			0xD0	//mpu6050 i2c address

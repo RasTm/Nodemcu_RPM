@@ -1,0 +1,9 @@
+*.settings
+*.code_review_properties
+*.cproject
+*.project
+*FlyBoard_f4.elf.launch
+*stm32f4_flash.ld
+Debug/
+Libraries/
+F1_gaz/
