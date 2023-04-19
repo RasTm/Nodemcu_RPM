@@ -1,10 +1,11 @@
-void no_calib_led(){
-  if(pulse_1.calibration_done == false){
-    for(uint8_t i = 0; i<NUM_LEDS; i++){                  
-      leds[i] = CRGB::White;
-    }
-    FastLED.show();
+void no_calib_led(){/*
+  for(uint8_t i = 0; i<NUM_LEDS/2; i++){                  
+    leds[i] = CRGB::Blue;
+  }*/
+  for(uint8_t i = 0; i<NUM_LEDS; i++){                  
+    leds[i] = CRGB::Green;
   }
+  FastLED.show(); 
 }
 
 void calibration(){
@@ -55,19 +56,31 @@ void calibration(){
   }
 }
 
+void check_pulse(){
+  pulse_1.last_period = pulse_1.period;
+  if(pulse_1.period == pulse_1.last_period){
+    pulse_1.x += 1;
+    if(pulse_1.x > 20 && (pulse_1.period < pulse_1.min_period || pulse_1.period == 0)){
+      for(uint8_t i = 0; i<NUM_LEDS; i++){                  
+        leds[i] = CRGB::White;
+      }
+      FastLED.show();
+    }
+  }
+}
+
 void check_calibration(){
   for(uint8_t i = 0; i<3; i++){
     EEPROM.get(i, EEPROM_data[i]);
-    Serial.println(EEPROM_data[i]);
-    delay(200);
   }
   pulse_1.max_period = EEPROM_data[0];
   pulse_1.min_period = EEPROM_data[1];
-  if(EEPROM_data[2] == 1) pulse_1.calibration_done = true;
-  else pulse_1.calibration_done = false;
-
-  no_calib_led();
-
-  Serial.printf("min = %d\n max = %d\n done = %d\n",pulse_1.min_period,pulse_1.max_period,pulse_1.calibration_done);
+  if(EEPROM_data[2] == true){
+    pulse_1.calibration_done = true;
+  }/*
+  else{ 
+    pulse_1.calibration_done = false;
+    no_calib_led();
+  }*/
+  Serial.printf("\nmin = %d\n max = %d\n done = %d\n",pulse_1.min_period,pulse_1.max_period,pulse_1.calibration_done);
 }
-
