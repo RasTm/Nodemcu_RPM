@@ -1,10 +1,13 @@
 void no_calib_led(){
-  if(pulse_1.calibration_done == false){
-    for(uint8_t i = 0; i<NUM_LEDS; i++){                  
-      leds[i] = CRGB::White;
+  for(uint8_t i = 0; i<NUM_LEDS; i++){
+    if(i%2 == 0){
+      leds[i] = CRGB::Black;
     }
-    FastLED.show();
+    else{
+      leds[i] = CRGB::Blue;
+    }
   }
+  FastLED.show(); 
 }
 
 void calibration(){
@@ -55,19 +58,66 @@ void calibration(){
   }
 }
 
+void check_pulse(){
+  pulse_1.last_period = pulse_1.period;
+  if(pulse_1.period == pulse_1.last_period){
+    pulse_1.x += 1;
+    if(pulse_1.x > 20 && (pulse_1.period < pulse_1.min_period || pulse_1.period == 0)){
+      for(uint8_t i = 0; i<NUM_LEDS; i++){                  
+        leds[i] = CRGB::White;
+      }
+      FastLED.show();
+    }
+  }
+}
+
 void check_calibration(){
-  for(uint8_t i = 0; i<3; i++){
+  for(uint8_t i = 0; i<4; i++){
     EEPROM.get(i, EEPROM_data[i]);
-    Serial.println(EEPROM_data[i]);
-    delay(200);
   }
   pulse_1.max_period = EEPROM_data[0];
   pulse_1.min_period = EEPROM_data[1];
-  if(EEPROM_data[2] == 1) pulse_1.calibration_done = true;
-  else pulse_1.calibration_done = false;
-
-  no_calib_led();
-
-  Serial.printf("min = %d\n max = %d\n done = %d\n",pulse_1.min_period,pulse_1.max_period,pulse_1.calibration_done);
+  if(EEPROM_data[2] == true){
+    pulse_1.calibration_done = true;
+  }
+  button_2.press_num= EEPROM_data[3];
+  if(button_2.press_num == 0){
+    color = CRGB::Red;
+  }
+  else if(button_2.press_num == 1){  
+    color = CRGB::Green;
+  }
+  else if(button_2.press_num == 2){
+    color = CRGB::Blue;
+  }
+  else if(button_2.press_num == 3){
+    color = CRGB::Aqua;
+  }
+  else if(button_2.press_num == 4){  
+    color = CRGB::Orange;
+  }
+  else if(button_2.press_num == 5){ 
+    color = CRGB::Gray;
+  }
+  else if(button_2.press_num == 6){
+    color = CRGB::Gold;
+  }
+  else if(button_2.press_num == 7){
+    color = CRGB::Magenta;
+  } 
+  else if(button_2.press_num == 8){
+    color = CRGB::DeepPink;
+  }
+  else if(button_2.press_num == 9){
+    color = CRGB::DarkViolet;
+  }
+  Serial.printf("\n min = %d\n max = %d\n done = %d\n color = %d",pulse_1.min_period,pulse_1.max_period,pulse_1.calibration_done,button_2.press_num);
 }
 
+void save_color(){
+  if(last_save != button_2.press_num){
+    last_save = button_2.press_num;
+    EEPROM.put(3,button_2.press_num);
+    EEPROM.commit(); 
+  }
+}
